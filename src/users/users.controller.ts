@@ -7,12 +7,14 @@ import {
   Patch,
   Post,
   ParseIntPipe,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { plainToInstance } from 'class-transformer';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -27,33 +29,54 @@ export class UsersController {
 
   // Get all users
   @Get()
-  async findAll() {
+  async findAll(@GetUser() user) {
+    if (user.role !== 'admin') {
+      throw new ForbiddenException('Access Denied');
+    }
     const users = await this.userService.findAll();
-    return users;
+    return plainToInstance(UserResponseDto, users, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  // Get single user by ID
+  @Get('profile')
+  async getProfile(@GetUser() user) {
+    const userData = await this.userService.findOne(user.id);
+    return plainToInstance(UserResponseDto, userData, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  // Get single user by ID only admin can access all users but individual can not access other users
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    const user = await this.userService.findOne(id);
-    return plainToInstance(UserResponseDto, user, {
+  async findOne(@Param('id', ParseIntPipe) id: number, @GetUser() user) {
+    if (user.id !== id && user.role !== 'admin') {
+      throw new ForbiddenException('Access Denied');
+    }
+    const foundUser = await this.userService.findOne(id);
+    return plainToInstance(UserResponseDto, foundUser, {
       excludeExtraneousValues: true,
     });
   }
 
   // Update user
   @Patch(':id')
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    await this.userService.update(id, updateUserDto);
-    return { message: 'User updated successfully' };
+  async update(@Param('id', ParseIntPipe) id: number, @GetUser() user) {
+    if (user.id !== id && user.role !== 'admin') {
+      throw new ForbiddenException('Access Denied');
+    }
+    const foundUser = await this.userService.findOne(id);
+    return plainToInstance(UserResponseDto, foundUser, {
+      excludeExtraneousValues: true,
+    });
   }
 
   // Delete user
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id', ParseIntPipe) id: number, @GetUser() user) {
+    if (user.id !== id && user.role !== 'admin') {
+      throw new ForbiddenException('Access Denied');
+    }
     await this.userService.remove(id);
     return { message: 'User deleted successfully' };
   }

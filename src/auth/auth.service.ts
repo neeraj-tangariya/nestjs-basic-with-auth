@@ -39,7 +39,7 @@ export class AuthService {
     });
     await this.userRepo.save(user);
 
-    const tokens = await this.getTokens(user.id, user.email);
+    const tokens = await this.getTokens(user.id, user.email, user.role);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return {
@@ -61,7 +61,7 @@ export class AuthService {
       throw new BadRequestException('Access Denied');
     }
 
-    const tokens = await this.getTokens(user.id, user.email);
+    const tokens = await this.getTokens(user.id, user.email, user.role);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
     return {
@@ -77,17 +77,17 @@ export class AuthService {
   }
 
   // getTokens
-  async getTokens(userId: number, email: string) {
+  async getTokens(userId: number, email: string, role: string) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
-        { userId, email },
+        { id: userId, email, role },
         {
           expiresIn: this.configService.get('JWT_ACCESS_TOKEN_EXPIRY'),
           secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
         },
       ),
       this.jwtService.signAsync(
-        { userId },
+        { id: userId, email, role },
         {
           expiresIn: this.configService.get('JWT_REFRESH_TOKEN_EXPIRY'),
           secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
