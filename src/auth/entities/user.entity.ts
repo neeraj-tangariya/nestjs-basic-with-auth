@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 // Role enum
 export enum Role {
@@ -31,4 +37,10 @@ export class User {
 
   @Column({ nullable: true })
   refreshToken?: string;
+
+  @CreateDateColumn({ nullable: true })
+  createdAt?: Date;
+
+  @UpdateDateColumn({ nullable: true })
+  updatedAt?: Date;
 }

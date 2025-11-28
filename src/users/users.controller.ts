@@ -11,33 +11,37 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserResponseDto } from './dto/user-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  // 1️⃣ Create user
+  // Create user
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.userService.create(createUserDto);
     return { message: 'User created successfully', user };
   }
 
-  // 2️⃣ Get all users
+  // Get all users
   @Get()
   async findAll() {
     const users = await this.userService.findAll();
     return users;
   }
 
-  // 3️⃣ Get single user by ID
+  // Get single user by ID
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const user = await this.userService.findOne(id);
-    return user;
+    return plainToInstance(UserResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  // 4️⃣ Update user
+  // Update user
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -47,7 +51,7 @@ export class UsersController {
     return { message: 'User updated successfully' };
   }
 
-  // 5️⃣ Delete user
+  // Delete user
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     await this.userService.remove(id);
