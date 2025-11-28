@@ -18,7 +18,7 @@ export class AuthService {
     @InjectRepository(User)
     private userRepo: Repository<User>,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   // SIGNUP
   async signup(dto: SignupDto) {
@@ -26,7 +26,7 @@ export class AuthService {
       where: { email: dto.email },
     });
 
-    if (userExists) throw new BadRequestException('Email already exists');
+    if (userExists) throw new BadRequestException('User already exists!');
 
     const hashedPass = await bcrypt.hash(dto.password, 10);
 
@@ -65,10 +65,6 @@ export class AuthService {
   // UPDATE USER
   async updateUser(id: number, dto: UpdateUserDto) {
     const user = await this.getUser(id);
-
-    if (dto.password) {
-      dto.password = await bcrypt.hash(dto.password, 10);
-    }
 
     await this.userRepo.update(id, dto);
 
