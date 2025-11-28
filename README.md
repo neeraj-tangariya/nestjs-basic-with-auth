@@ -93,6 +93,42 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 - Website - [https://nestjs.com](https://nestjs.com/)
 - Twitter - [@nestframework](https://twitter.com/nestframework)
 
+## Authentication Strategy
+
+This project uses a **Global Authentication Guard** strategy. This means that by default, **ALL** routes in the application are protected and require a valid JWT token in the `Authorization` header (`Bearer <token>`).
+
+### How it works
+
+1.  **Global Guard**: The `AuthGuard` is registered globally in `AppModule` using the `APP_GUARD` token. This ensures it runs for every request.
+2.  **Public Routes**: To make a route accessible without a token (e.g., login, signup), we use the custom `@Public()` decorator.
+
+### Usage
+
+#### Making a Route Public
+
+Import the `@Public` decorator and apply it to your controller method:
+
+```typescript
+import { Public } from 'src/auth/decorators/public.decorator';
+
+@Public()
+@Post('login')
+login() {
+  // ...
+}
+```
+
+#### Protected Routes (Default)
+
+You do **not** need to add `@UseGuards(AuthGuard)` to your controllers. Just define the route, and it will be automatically protected.
+
+```typescript
+@Get('profile')
+getProfile() {
+  // This route is automatically protected
+}
+```
+
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
