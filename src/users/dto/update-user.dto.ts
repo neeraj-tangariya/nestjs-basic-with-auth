@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { Role } from '../entities/user.entity';
+import { Role } from '../../auth/entities/user.entity';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -11,8 +11,4 @@ export class UpdateUserDto {
   @IsOptional()
   @IsEnum(Role, { message: 'Invalid role' })
   role?: Role;
-
-  @IsOptional()
-  @IsString()
-  refreshToken?: string | null;
 }

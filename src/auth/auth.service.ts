@@ -9,7 +9,7 @@ import { SignupDto } from './dto/signup.dto';
 import { SigninDto } from './dto/signin.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto } from '../users/dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 
