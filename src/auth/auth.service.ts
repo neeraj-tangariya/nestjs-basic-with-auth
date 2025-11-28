@@ -44,7 +44,7 @@ export class AuthService {
 
     return {
       message: 'User Registered Successfully!',
-      tokens,
+      data: { tokens },
     };
   }
 
@@ -66,8 +66,7 @@ export class AuthService {
 
     return {
       message: 'User Logged In Successfully!',
-      data: user,
-      tokens,
+      data: { user, tokens },
     };
   }
 

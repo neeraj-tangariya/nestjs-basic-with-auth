@@ -24,7 +24,10 @@ export class UsersController {
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.userService.create(createUserDto);
-    return { message: 'User created successfully', user };
+    return {
+      message: 'User created successfully',
+      user,
+    };
   }
 
   // Get all users
@@ -42,9 +45,15 @@ export class UsersController {
   @Get('profile')
   async getProfile(@GetUser() user) {
     const userData = await this.userService.findOne(user.id);
-    return plainToInstance(UserResponseDto, userData, {
+    const data = plainToInstance(UserResponseDto, userData, {
       excludeExtraneousValues: true,
     });
+    return {
+      message: 'Success',
+      data: {
+        user: data,
+      },
+    };
   }
 
   // Get single user by ID only admin can access all users but individual can not access other users
@@ -61,12 +70,17 @@ export class UsersController {
 
   // Update user
   @Patch(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @GetUser() user) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateUserDto: UpdateUserDto,
+    @GetUser() user,
+  ) {
     if (user.id !== id && user.role !== 'admin') {
       throw new ForbiddenException('Access Denied');
     }
-    const foundUser = await this.userService.findOne(id);
-    return plainToInstance(UserResponseDto, foundUser, {
+    await this.userService.update(id, updateUserDto);
+    const updatedUser = await this.userService.findOne(id);
+    return plainToInstance(UserResponseDto, updatedUser, {
       excludeExtraneousValues: true,
     });
   }
