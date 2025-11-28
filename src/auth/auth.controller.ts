@@ -25,19 +25,4 @@ export class AuthController {
   signin(@Body() dto: SigninDto) {
     return this.authService.signin(dto);
   }
-
-  @Get(':id')
-  view(@Param('id') id: number) {
-    return this.authService.getUser(id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: number, @Body() dto: UpdateUserDto) {
-    return this.authService.updateUser(id, dto);
-  }
-
-  @Delete(':id')
-  delete(@Param('id') id: number) {
-    return this.authService.deleteUser(id);
-  }
 }

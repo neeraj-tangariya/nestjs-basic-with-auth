@@ -11,14 +11,16 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private userRepo: Repository<User>,
+    private configService: ConfigService,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   // SIGNUP
   async signup(dto: SignupDto) {
@@ -26,57 +28,78 @@ export class AuthService {
       where: { email: dto.email },
     });
 
-    if (userExists) throw new BadRequestException('User already exists!');
+    if (userExists) {
+      throw new BadRequestException('User already exists!');
+    }
 
-    const hashedPass = await bcrypt.hash(dto.password, 10);
-
+    const hashedPassword = await this.hashData(dto.password);
     const user = this.userRepo.create({
       ...dto,
-      password: hashedPass,
+      password: hashedPassword,
     });
-
     await this.userRepo.save(user);
 
-    return { message: 'User registered successfully' };
+    const tokens = await this.getTokens(user.id, user.email);
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+
+    return {
+      message: 'User Registered Successfully!',
+      tokens,
+    };
   }
 
   // SIGNIN
   async signin(dto: SigninDto) {
-    const user = await this.userRepo.findOne({ where: { email: dto.email } });
+    const user = await this.userRepo.findOneBy({ email: dto.email });
 
-    if (!user) throw new BadRequestException('Invalid credentials');
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
 
-    const isMatch = await bcrypt.compare(dto.password, user.password);
-    if (!isMatch) throw new BadRequestException('Invalid credentials');
+    const isPasswordMatched = await bcrypt.compare(dto.password, user.password);
+    if (!isPasswordMatched) {
+      throw new BadRequestException('Access Denied');
+    }
 
-    const token = this.jwtService.sign({ id: user.id, email: user.email });
+    const tokens = await this.getTokens(user.id, user.email);
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
 
-    return { message: 'Login successful', token };
+    return {
+      message: 'User Logged In Successfully!',
+      data: user,
+      tokens,
+    };
   }
 
-  // VIEW USER
-  async getUser(id: number) {
-    const user = await this.userRepo.findOne({ where: { id } });
-    if (!user) throw new NotFoundException('User not found');
-
-    return user;
+  // hashing data
+  async hashData(data: string) {
+    return bcrypt.hash(data, 10);
   }
 
-  // UPDATE USER
-  async updateUser(id: number, dto: UpdateUserDto) {
-    const user = await this.getUser(id);
+  // getTokens
+  async getTokens(userId: number, email: string) {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(
+        { userId, email },
+        {
+          expiresIn: this.configService.get('JWT_ACCESS_TOKEN_EXPIRY'),
+          secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
+        },
+      ),
+      this.jwtService.signAsync(
+        { userId },
+        {
+          expiresIn: this.configService.get('JWT_REFRESH_TOKEN_EXPIRY'),
+          secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
+        },
+      ),
+    ]);
 
-    await this.userRepo.update(id, dto);
-
-    return { message: 'User updated successfully' };
+    return { accessToken, refreshToken };
   }
 
-  // DELETE USER
-  async deleteUser(id: number) {
-    const user = await this.getUser(id);
-
-    await this.userRepo.remove(user);
-
-    return { message: 'User deleted successfully' };
+  async updateRefreshToken(userId: number, refreshToken: string) {
+    const hash = await this.hashData(refreshToken);
+    await this.userRepo.update(userId, { refreshToken: hash });
   }
 }
