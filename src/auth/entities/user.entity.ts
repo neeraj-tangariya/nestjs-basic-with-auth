@@ -32,6 +32,15 @@ export class User {
   @Column({ default: true })
   isActive: boolean;
 
+  @Column({ nullable: true })
+  mfaOtpHash?: string;
+
+  @Column({ nullable: true })
+  mfaOtpExpiresAt?: Date;
+
+  @Column({ default: false })
+  mfaEmailVerified: boolean;
+
   @Column({ default: Role.USER })
   role: Role;
 

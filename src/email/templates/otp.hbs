@@ -1,0 +1,151 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Email Verification OTP</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px;
+        text-align: center;
+        color: #ffffff;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+      }
+      .content {
+        padding: 40px 30px;
+      }
+      .greeting {
+        font-size: 18px;
+        color: #333333;
+        margin-bottom: 20px;
+      }
+      .message {
+        font-size: 16px;
+        color: #666666;
+        line-height: 1.6;
+        margin-bottom: 30px;
+      }
+      .otp-container {
+        background-color: #f8f9fa;
+        border: 2px dashed #667eea;
+        border-radius: 8px;
+        padding: 25px;
+        text-align: center;
+        margin: 30px 0;
+      }
+      .otp-label {
+        font-size: 14px;
+        color: #666666;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .otp-code {
+        font-size: 36px;
+        font-weight: bold;
+        color: #667eea;
+        letter-spacing: 8px;
+        font-family: 'Courier New', monospace;
+      }
+      .expiry-info {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+      .expiry-info p {
+        margin: 0;
+        color: #856404;
+        font-size: 14px;
+      }
+      .footer {
+        background-color: #f8f9fa;
+        padding: 20px 30px;
+        text-align: center;
+        font-size: 14px;
+        color: #999999;
+      }
+      .footer p {
+        margin: 5px 0;
+      }
+      .security-note {
+        margin-top: 30px;
+        padding: 15px;
+        background-color: #e7f3ff;
+        border-left: 4px solid #2196f3;
+        border-radius: 4px;
+      }
+      .security-note p {
+        margin: 0;
+        color: #0c5460;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='header'>
+        <h1>🔐 Email Verification</h1>
+      </div>
+
+      <div class='content'>
+        <p class='greeting'>Hello {{firstName}},</p>
+
+        <p class='message'>
+          Thank you for registering with Project Stark! To complete your
+          registration and verify your email address, please use the One-Time
+          Password (OTP) below:
+        </p>
+
+        <div class='otp-container'>
+          <div class='otp-label'>Your OTP Code</div>
+          <div class='otp-code'>{{otp}}</div>
+        </div>
+
+        <div class='expiry-info'>
+          <p>⏰ This OTP will expire in
+            <strong>{{expiryMinutes}} minutes</strong>. Please use it before it
+            expires.</p>
+        </div>
+
+        <p class='message'>
+          Enter this code in the verification page to complete your email
+          verification and activate your account.
+        </p>
+
+        <div class='security-note'>
+          <p>
+            <strong>🔒 Security Note:</strong>
+            If you didn't request this OTP, please ignore this email. Never
+            share your OTP with anyone. Our team will never ask for your OTP.
+          </p>
+        </div>
+      </div>
+
+      <div class='footer'>
+        <p><strong>Project Stark</strong></p>
+        <p>This is an automated email. Please do not reply to this message.</p>
+        <p>&copy; 2024 Project Stark. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>
