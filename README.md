@@ -93,6 +93,18 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 - Website - [https://nestjs.com](https://nestjs.com/)
 - Twitter - [@nestframework](https://twitter.com/nestframework)
 
+## API Documentation (Swagger)
+
+This project includes interactive API documentation using Swagger/OpenAPI.
+
+**Access Swagger UI:**
+
+```
+http://localhost:3000/api
+```
+
+For detailed implementation guide, see [SWAGGER_IMPLEMENTATION.md](./SWAGGER_IMPLEMENTATION.md)
+
 ## Authentication Strategy
 
 This project uses a **Global Authentication Guard** strategy. This means that by default, **ALL** routes in the application are protected and require a valid JWT token in the `Authorization` header (`Bearer <token>`).

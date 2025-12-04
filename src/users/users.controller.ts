@@ -15,13 +15,23 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
+@ApiTags('users')
+@ApiBearerAuth('JWT-auth')
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   // Create user
   @Post()
+  @ApiOperation({ summary: 'Create a new user' })
+  @ApiResponse({ status: 201, description: 'User created successfully' })
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.userService.create(createUserDto);
     return {
@@ -32,6 +42,12 @@ export class UsersController {
 
   // Get all users
   @Get()
+  @ApiOperation({ summary: 'Get all users (Admin only)' })
+  @ApiResponse({ status: 200, description: 'Returns all users' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin access required',
+  })
   async findAll(@GetUser() user) {
     if (user.role !== 'admin') {
       throw new ForbiddenException('Access Denied');
@@ -43,6 +59,8 @@ export class UsersController {
   }
 
   @Get('profile')
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiResponse({ status: 200, description: 'Returns current user profile' })
   async getProfile(@GetUser() user) {
     const userData = await this.userService.findOne(user.id);
     const data = plainToInstance(UserResponseDto, userData, {
@@ -58,6 +76,12 @@ export class UsersController {
 
   // Get single user by ID only admin can access all users but individual can not access other users
   @Get(':id')
+  @ApiOperation({ summary: 'Get user by ID' })
+  @ApiResponse({ status: 200, description: 'Returns user data' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Can only access own profile unless admin',
+  })
   async findOne(@Param('id', ParseIntPipe) id: number, @GetUser() user) {
     if (user.id !== id && user.role !== 'admin') {
       throw new ForbiddenException('Access Denied');
@@ -70,6 +94,12 @@ export class UsersController {
 
   // Update user
   @Patch(':id')
+  @ApiOperation({ summary: 'Update user by ID' })
+  @ApiResponse({ status: 200, description: 'User updated successfully' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Can only update own profile unless admin',
+  })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
@@ -87,6 +117,12 @@ export class UsersController {
 
   // Delete user
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete user by ID' })
+  @ApiResponse({ status: 200, description: 'User deleted successfully' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Can only delete own profile unless admin',
+  })
   async remove(@Param('id', ParseIntPipe) id: number, @GetUser() user) {
     if (user.id !== id && user.role !== 'admin') {
       throw new ForbiddenException('Access Denied');
