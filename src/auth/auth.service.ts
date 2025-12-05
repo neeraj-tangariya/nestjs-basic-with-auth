@@ -137,8 +137,8 @@ export class AuthService {
     // Mark email as verified and clear OTP
     await this.userRepo.update(user.id, {
       mfaEmailVerified: true,
-      mfaOtpHash: undefined,
-      mfaOtpExpiresAt: undefined,
+      mfaOtpHash: null,
+      mfaOtpExpiresAt: null,
     });
 
     // Generate tokens

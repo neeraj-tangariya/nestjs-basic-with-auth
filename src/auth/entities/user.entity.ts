@@ -32,11 +32,11 @@ export class User {
   @Column({ default: true })
   isActive: boolean;
 
-  @Column({ nullable: true })
-  mfaOtpHash?: string;
+  @Column({ type: 'varchar', nullable: true })
+  mfaOtpHash?: string | null;
 
-  @Column({ nullable: true })
-  mfaOtpExpiresAt?: Date;
+  @Column({ type: 'datetime', nullable: true })
+  mfaOtpExpiresAt?: Date | null;
 
   @Column({ default: false })
   mfaEmailVerified: boolean;
